@@ -1,0 +1,19 @@
+{
+ "content": null,
+ "creation": "2025-07-03 12:36:56.419658",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2025-07-03 12:36:56.419658",
+ "modified_by": "Administrator",
+ "module": "Custom App",
+ "name": "task-blogging",
+ "owner": "Administrator",
+ "page_name": "task-blogging",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Task Blogging"
+}
