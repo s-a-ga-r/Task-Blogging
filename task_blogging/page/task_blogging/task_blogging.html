@@ -18,14 +18,14 @@
         </div>
     </div>
 
-    <button class="add-post-btn" onclick="openModal()">+</button>
+    <button class="add-post-btn open-modal">+</button>
 
     <div id="postModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Create New Post</h2>
+                <h2 class="modal-title">Create New Blog</h2>
                 <!-- <button class="close-btn" onclick="closeModal()">&times;</button> -->
-                <button class="close-btn">&times;</button>
+                <button class="close-btn close-model">&times;</button>
             </div>
             <form id="postForm">
                 <div class="form-group">
@@ -41,7 +41,7 @@
                     <textarea id="postContent" name="postContent" required></textarea>
                 </div>
                 <div style="text-align: right;">
-                    <button type="button" class="cancel-btn">Cancel</button>
+                    <button type="button" class="cancel-btn close-model">Cancel</button>
                     <!-- <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button> -->
                     <button type="submit" class="submit-btn">Publish Post</button>
                 </div>

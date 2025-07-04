@@ -6,19 +6,12 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "user",
+  "author",
   "task_name",
   "description",
   "date"
  ],
  "fields": [
-  {
-   "fieldname": "user",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "User",
-   "options": "User"
-  },
   {
    "fieldname": "task_name",
    "fieldtype": "Data",
@@ -35,11 +28,18 @@
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Date"
+  },
+  {
+   "fieldname": "author",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Author",
+   "options": "User"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-03 15:11:06.987501",
+ "modified": "2025-07-04 09:02:42.404673",
  "modified_by": "Administrator",
  "module": "Task Blogging",
  "name": "Tasks",
