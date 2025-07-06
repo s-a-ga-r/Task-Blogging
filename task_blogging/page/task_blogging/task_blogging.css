@@ -1,8 +1,8 @@
 * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -24,24 +24,15 @@
             background: transparent;
         }
 
-        /* .blog-post {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        } */
-
         .blog-post {
             background: white;
             border-radius: 8px;
             padding: 30px;
             margin-bottom: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
+    
         .blog-post:last-child {
             margin-bottom: 0;
         }
@@ -301,3 +292,7 @@
         .empty-state p {
             font-size: 14px;
         }
+
+
+
+        

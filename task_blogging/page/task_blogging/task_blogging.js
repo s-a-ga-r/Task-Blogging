@@ -48,46 +48,41 @@ class BlogApp {
 
 	initSampleData() {
 		if (this.posts.length === 0) {
-
-			this.tasks = [
+			 this.posts = [
                         {
                             id: 1,
-                            title: 'Complete Django Tutorial Series',
-                            description: 'My latest task! This is exciting...\n\nThis will be a good overview of how to use the Django framework. I hope to learn a lot and enjoy the series!\n\nThe tutorial covers:\n- Setting up Django environment\n- Creating models and views\n- Working with templates\n- Database migrations\n- User authentication\n- Deployment strategies\n\nI plan to build a small project alongside the tutorial to practice what I learn.',
-                            category: 'learning',
-                            priority: 'high',
-                            status: 'in-progress',
-                            startTime: '2024-08-27T09:00',
-                            endTime: '2024-08-27T11:00',
-                            createdAt: new Date('2024-08-27').toISOString(),
-                            author: 'TaskUser'
+                            author: 'CoreyMS',
+                            title: 'My Latest Post!',
+                            content: 'My latest post! This is exciting...\n\nThis will be a good overview of how to use the Django framework. I hope you all learn a lot and enjoy the series!',
+                            date: 'August 27, 2018',
+                            avatar: 'C'
                         },
                         {
                             id: 2,
-                            title: 'Research Top 5 YouTube Channels For Learning Programming',
-                            description: 'Find the best programming channels on YouTube. Need to evaluate content quality, teaching style, and community engagement.\n\nThis will help me plan my learning path for the next months.\n\nChannels to research:\n- FreeCodeCamp\n- The Net Ninja\n- Traversy Media\n- Programming with Mosh\n- Corey Schafer\n\nCriteria for evaluation:\n- Content quality and accuracy\n- Teaching methodology\n- Community engagement\n- Regular updates\n- Beginner-friendly approach',
-                            category: 'work',
-                            priority: 'medium',
-                            status: 'completed',
-                            startTime: '2024-08-26T14:00',
-                            endTime: '2024-08-26T16:00',
-                            createdAt: new Date('2024-08-26').toISOString(),
-                            author: 'TaskUser'
+                            author: 'TestUser',
+                            title: 'Top 5 YouTube Channels For Learning Programming',
+                            content: 'Quo inanis quando ea, mel an vide adversarium suscipiantur. Et dicunt eleifend splendide pro. Nibh animal dolorem vim ex, nec te agam referrentur. Usu admodum ocurreret ne.\n\nEt dico audire cotidieque sed, cibo latine ut has, an case magna alienum.',
+                            date: 'August 26, 2018',
+                            avatar: 'T'
                         },
                         {
                             id: 3,
-                            title: 'Data Science Project Planning',
-                            description: 'Plan the next data science project. Need to define scope, timeline, and required resources.\n\nThis project will focus on analyzing user behavior patterns and creating predictive models.\n\nProject phases:\n1. Data collection and cleaning\n2. Exploratory data analysis\n3. Feature engineering\n4. Model development\n5. Model evaluation\n6. Deployment and monitoring\n\nExpected outcomes:\n- Improved user engagement metrics\n- Better understanding of user patterns\n- Predictive capabilities for user behavior',
-                            category: 'project',
-                            priority: 'high',
-                            status: 'pending',
-                            startTime: '2024-08-26T10:00',
-                            endTime: '2024-08-26T12:00',
-                            createdAt: new Date('2024-08-26').toISOString(),
-                            author: 'TaskUser'
+                            author: 'TestUser',
+                            title: 'The Rise of Data Science',
+                            content: 'Per omittam placerat at. Eius aeque ei mei. Usu ex partiendo salutandi. Pro illud placerat molestiae ex, habeo vidisse volutpatum cu vel, efficiendi accommodare eum ea! Ne has case minimum facilisis, pertinax efficiendi eu vel!\n\nEt movet semper assueverit his. Mei et liber vitae. Vix et pericula definebas, vero falli.',
+                            date: 'August 26, 2018',
+                            avatar: 'T'
+                        },
+                        {
+                            id: 4,
+                            author: 'TestUser',
+                            title: '5 Tips for Writing Catchy Headlines',
+                            content: 'Learn how to write headlines that grab attention and keep readers engaged. These simple techniques will help you create compelling titles for your blog posts.',
+                            date: 'August 26, 2018',
+                            avatar: 'T'
                         }
                     ];
-                    this.saveTasks();
+                    this.savePosts();
 		}
 	}
 
@@ -107,86 +102,35 @@ class BlogApp {
 
 	renderPosts() {
 		const blogPosts = document.getElementById('blogPosts');
-		let filteredTasks = this.tasks;
-
-		switch (this.currentFilter) {
-                    case 'today':
-                        const today = new Date().toDateString();
-                        filteredTasks = this.tasks.filter(task => 
-                            new Date(task.startTime).toDateString() === today
-                        );
-                        break;
-                    case 'high':
-                        filteredTasks = this.tasks.filter(task => task.priority === 'high');
-                        break;
-                    case 'completed':
-                        filteredTasks = this.tasks.filter(task => task.status === 'completed');
-                        break;
-                    case 'pending':
-                        filteredTasks = this.tasks.filter(task => task.status === 'pending');
-                        break;
-                }
-
-                if (filteredTasks.length === 0) {
-                    blogPosts.innerHTML = `
-                        <div class="empty-state">
-                            <h3>No tasks found</h3>
-                            <p>Start by creating your first task!</p>
-                        </div>
-                    `;
-                    return;
-                }
+		
 
 		
-		// if (this.posts.length === 0) {
-		// 	blogPosts.innerHTML = `
-		// 		<div class="empty-state">
-		// 			<h3>No posts yet</h3>
-		// 			<p>Start by creating your first blog post!</p>
-		// 		</div>
-		// 	`;
-		// 	return;
-		// }
+		if (this.posts.length === 0) {
+			blogPosts.innerHTML = `
+				<div class="empty-state">
+					<h3>No posts yet</h3>
+					<p>Start by creating your first blog post!</p>
+				</div>
+			`;
+			return;
+		}
 
-		// blogPosts.innerHTML = this.posts.map(post => `
-		// 	<div class="blog-post">
-		// 		<div class="post-header">
-		// 			<div class="author-avatar">${post.avatar}</div>
-		// 			<div class="post-meta">
-		// 				<div class="author-name">${post.author}</div>
-		// 				<div class="post-date">${post.date}</div>
-		// 			</div>
-		// 		</div>
-		// 		<h2 class="post-title">${post.title}</h2>
-		// 		<div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>
-		// 	</div>
-		// `).join('');
+		blogPosts.innerHTML = this.posts.map(post => `
+			<div class="blog-post">
+				<div class="post-header">
+					<div class="author-avatar">${post.avatar}</div>
+					<div class="post-meta">
+						<div class="author-name">${post.author}</div>
+						<div class="post-date">${post.date}</div>
+					</div>
+				</div>
+				<h2 class="post-title">${post.title}</h2>
+				<div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>
+			</div>
+		`).join('');
 
-
-		blogPosts.innerHTML = filteredTasks.map(task => `
-                    <div class="task-post">
-                        <div class="post-header">
-                            <div class="author-avatar">${task.author.charAt(0)}</div>
-                            <div class="post-meta">
-                                <div class="author-name">${task.author}</div>
-                                <div class="post-date">${this.formatDate(task.createdAt)}</div>
-                            </div>
-                            <div class="task-status ${task.status.replace('-', '')}">${task.status.replace('-', ' ').toUpperCase()}</div>
-                        </div>
-                        <h2 class="task-title">${task.title}</h2>
-                        <div class="task-content task-content-preview">${task.description.split('\n')[0]}</div>
-                        <div class="task-details">
-                            <span class="task-category">${task.category.toUpperCase()}</span>
-                            <span class="task-priority ${task.priority}">${task.priority.toUpperCase()}</span>
-                            <span class="task-time">${this.formatDateTime(task.startTime)} - ${this.formatDateTime(task.endTime)}</span>
-                        </div>
-                        <div class="post-actions">
-                            <button class="action-btn view-btn" onclick="viewTask(${task.id})">Read More</button>
-                            <button class="action-btn delete-btn" onclick="confirmDeleteTask(${task.id})">Delete</button>
-                        </div>
-                    </div>
-                `).join('');
 	}
+	
 
 	addPost() {
 		const form = document.getElementById('postForm');
