@@ -2,7 +2,6 @@ frappe.pages['task-blogging-v2'].on_page_load = function(wrapper) {
 	new TaskBlogApp(wrapper);
 }
 
-
 class TaskBlogApp {
     constructor(wrapper) {
 		this.wrapper = wrapper;
@@ -20,7 +19,6 @@ class TaskBlogApp {
 
 	renderTemplate() {
 		$(frappe.render_template("task_blogging_v2", {})).appendTo(this.page.main);
-
 		this.tasks = JSON.parse(localStorage.getItem('taskBlogTasks') || '[]');
         this.selectedPriority = 'medium';
         this.currentFilter = 'all';
@@ -31,6 +29,7 @@ class TaskBlogApp {
         this.bindEvents();
 		this.openModal()
 		this.closeModal()
+		this.deleteBlog()
 	}
 
 	openModal() {
@@ -48,11 +47,40 @@ class TaskBlogApp {
 		})
     }
 
-	viewTask(){
+	deleteBlog() {
+		let self = this
+		$(document).on("click", ".delete-btn", function (event) {
+			console.log("delete clicked")
 
-	}
+			let taskid = $(this).data("task-id");
+			// console.log(taskid);
 
-	
+			self.confirmDeleteTask(taskid)
+
+
+			
+        	// document.getElementById('taskModal').style.display = 'none';
+		})
+        $(document).on("click", ".confirm-delete-btn", function (event) {
+			console.log("confirm clicked clicked")
+			self.deleteTask()
+		})
+    }
+
+	// viewTask(){
+	// }
+
+    viewBlog(){
+        let self =this
+        $(document).on("click",".view-btn", function(event){
+            console.log("view-blog clicked");
+            // 
+            let taskid = $(this).data("task-id")
+            console.log(taskid);
+            self.viewTask(taskid)
+
+        })
+    }
 
     initSampleData() {
         if (this.tasks.length === 0) {
@@ -97,6 +125,7 @@ class TaskBlogApp {
             this.saveTasks();
         }
     }
+
 
     bindEvents() {
         document.getElementById('taskForm').addEventListener('submit', (e) => {
@@ -194,19 +223,20 @@ class TaskBlogApp {
                     <span class="task-time">${this.formatDateTime(task.startTime)} - ${this.formatDateTime(task.endTime)}</span>
                 </div>
                 <div class="post-actions">
-                    <button class="action-btn view-btn" data.task_id=${task.id}>Read More</button>
-                    <button class="action-btn delete-btn" onclick="confirmDeleteTask(${task.id})">Delete</button>
+                    <button class="action-btn view-btn" data-task-id=${task.id}>Read More</button>
+                    <button class="action-btn delete-btn" data-task-id="${task.id}">Delete</button>
                 </div>
             </div>
         `).join('');
+
+
+        this.viewBlog()
     }
 
     viewTask(taskId) {
         const task = this.tasks.find(t => t.id === taskId);
         if (!task) return;
-
         this.currentTaskId = taskId;
-
         // Populate blog reader modal
         document.getElementById('blogTitle').textContent = task.title;
         document.getElementById('blogAvatar').textContent = task.author.charAt(0);
@@ -241,7 +271,6 @@ class TaskBlogApp {
                 <div class="blog-reader-detail-value">${this.calculateDuration(task.startTime, task.endTime)}</div>
             </div>
         `;
-
         // Show blog reader modal
         document.getElementById('blogReaderModal').style.display = 'block';
     }
@@ -253,7 +282,6 @@ class TaskBlogApp {
 
     deleteTask() {
         if (!this.currentTaskId) return;
-
         this.tasks = this.tasks.filter(task => task.id !== this.currentTaskId);
         this.saveTasks();
         this.renderTasks();
