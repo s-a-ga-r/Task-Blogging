@@ -208,8 +208,15 @@ body {
     color: white;
 }
 
+.back-btn {
+    background: #070707;
+    color: white;
+}
 .delete-btn:hover {
     background: #c82333;
+}
+.back-btn:hover {
+    background: #096446;
 }
 
 .sidebar {
@@ -491,9 +498,10 @@ body {
     padding: 0;
     border-radius: 8px;
     max-width: 800px;
-    width: 90%;
+    width: 100%;
+    height: 100%;
     max-height: 90vh;
-    overflow-y: auto;
+    /* overflow-y: auto;   help to scrole content: ; */
 }
 
 .blog-reader-header {
@@ -516,8 +524,8 @@ body {
 }
 
 .blog-reader-avatar {
-    width: 60px;
-    height: 60px;
+    width: 31px;
+    height: 31px;
     border-radius: 50%;
     margin-right: 15px;
     background: linear-gradient(135deg, #667eea, #764ba2);
