@@ -47,6 +47,8 @@ class TaskBlogApp {
         })
     }
 
+
+
     deleteBlog() {
         let self = this
         $(document).on("click", ".delete-btn", function (event) {
@@ -359,8 +361,17 @@ class TaskBlogApp {
         // Add event listener for the delete button
         $(".action-btn.delete-btn").click(function () {
             // Handle delete functionality
-            confirmDelete();
+            self.confirmDeleteTask();
         });
+    }
+
+    closeBlogReader() {
+        document.getElementById('blogReaderModal').style.display = 'none';
+        this.currentTaskId = null;
+        // Clear the blog reader content
+        $(".container2").html("");
+        $(".page-container").html("")
+        $("#body").html("");
     }
 
     confirmDeleteTask(taskId) {
