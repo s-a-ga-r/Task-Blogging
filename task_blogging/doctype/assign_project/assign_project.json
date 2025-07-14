@@ -5,17 +5,69 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_l7pq"
+  "project_name",
+  "description",
+  "category",
+  "priority",
+  "status",
+  "start_time",
+  "end_time",
+  "created_at",
+  "author"
  ],
  "fields": [
   {
-   "fieldname": "section_break_l7pq",
-   "fieldtype": "Section Break"
+   "fieldname": "project_name",
+   "fieldtype": "Data",
+   "label": "Project Name"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "learning\nwork\nproject"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "\nHigh\nMedium\nLow"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "pending\ncompleted\nin-progress"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time"
+  },
+  {
+   "fieldname": "created_at",
+   "fieldtype": "Datetime",
+   "label": "Created At"
+  },
+  {
+   "fieldname": "author",
+   "fieldtype": "Data",
+   "label": "Author"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-12 00:52:57.770927",
+ "modified": "2025-07-14 23:27:57.356875",
  "modified_by": "Administrator",
  "module": "Task Blogging",
  "name": "Assign Project",

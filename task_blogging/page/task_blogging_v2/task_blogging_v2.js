@@ -31,7 +31,7 @@ class TaskBlogApp {
         this.OpenAddTask()
         this.closeAddTask()
         this.deleteBlog()
-        this.closeBlogViewer()
+        this.closeViewer()
     }
    
     initSampleData() {
@@ -116,6 +116,7 @@ class TaskBlogApp {
     }
     
     renderTasks() {
+        console.log("rendering tasks");
         const taskPosts = document.getElementById('taskPosts');
         let filteredTasks = this.tasks;
 
@@ -223,7 +224,10 @@ class TaskBlogApp {
     viewTask(taskId) {
         let self = this
         const task = this.tasks.find(t => t.id === taskId);
-        if (!task) return;
+        if (!task) {
+            console.error(`Task with ID ${taskId} not found`);
+            return;
+        };
 
         this.currentTaskId = taskId;
 
@@ -287,11 +291,13 @@ class TaskBlogApp {
         $("#body").append(blogReaderHTML);
 
         // Add event listener for the close button
-        $(".blog-reader-close").click(function () {
+        $(".blog-reader-close .close-viewer").click(function () {
             // $(".container2").html("");
             console.log("close clicked");
 
-            self.renderTasks()
+            self.closeBlogReader();
+
+            // self.renderTasks()
             // Optional: reload your task posts here if needed
             // loadTaskPosts();
         });
@@ -307,7 +313,6 @@ class TaskBlogApp {
         $(document).on("click", "#open-modal", function (event) {
             console.log("clicked")
             document.getElementById('taskModal').style.display = 'block';
-
         })
     }
 
@@ -319,7 +324,7 @@ class TaskBlogApp {
     }
 
 
-    closeBlogViewer() {
+    closeViewer() {
         let self = this
         $(document).on("click", ".close-viewer", function (event) {
             console.log("close clicked")
@@ -328,6 +333,14 @@ class TaskBlogApp {
         })
     }
 
+    closeBlogReader() {
+        // document.getElementById('blogReaderModal').style.display = 'none';
+        $("#blogReaderModal").remove();
+        this.currentTaskId = null;
+        this.renderTemplate()
+    }
+
+
     deleteBlog() {
         let self = this
         $(document).on("click", ".delete-btn", function (event) {
@@ -335,11 +348,7 @@ class TaskBlogApp {
 
             let taskid = $(this).data("task-id");
             // console.log(taskid);
-
             self.deleteTask()
-
-
-
             // document.getElementById('taskModal').style.display = 'none';
         })
         $(document).on("click", ".confirm-delete-btn", function (event) {
@@ -481,16 +490,6 @@ class TaskBlogApp {
 
         document.getElementById('startTime').value = startTime.toISOString().slice(0, 16);
         document.getElementById('endTime').value = endTime.toISOString().slice(0, 16);
-    }
-
-
-
-
-    closeBlogReader() {
-        document.getElementById('blogReaderModal').style.display = 'none';
-        this.currentTaskId = null;
-        this.renderTemplate()
-        
     }
 
     closeDeleteModal() {
