@@ -18,6 +18,7 @@ class TaskBlogApp {
     }
 
     renderTemplate() {
+        console.log("rendererddd");
         $(frappe.render_template("task_blogging_v2", {})).appendTo(this.page.main);
         this.tasks = JSON.parse(localStorage.getItem('taskBlogTasks') || '[]');
         this.selectedPriority = 'medium';
@@ -27,63 +28,12 @@ class TaskBlogApp {
         this.renderTasks();
         this.updateStats();
         this.bindEvents();
-        this.openModal()
-        this.closeModal()
+        this.OpenAddTask()
+        this.closeAddTask()
         this.deleteBlog()
+        this.closeBlogViewer()
     }
-
-    openModal() {
-        $(document).on("click", "#open-modal", function (event) {
-            console.log("clicked")
-            document.getElementById('taskModal').style.display = 'block';
-
-        })
-    }
-
-    closeModal() {
-        $(document).on("click", ".close-model", function (event) {
-            console.log("close clicked")
-            document.getElementById('taskModal').style.display = 'none';
-        })
-    }
-
-
-
-    deleteBlog() {
-        let self = this
-        $(document).on("click", ".delete-btn", function (event) {
-            console.log("delete clicked")
-
-            let taskid = $(this).data("task-id");
-            // console.log(taskid);
-
-            self.confirmDeleteTask(taskid)
-
-
-
-            // document.getElementById('taskModal').style.display = 'none';
-        })
-        $(document).on("click", ".confirm-delete-btn", function (event) {
-            console.log("confirm clicked clicked")
-            self.deleteTask()
-        })
-    }
-
-    // viewTask(){
-    // }
-
-    viewBlog() {
-        let self = this
-        $(document).on("click", ".view-btn", function (event) {
-            console.log("view-blog clicked");
-            // 
-            let taskid = $(this).data("task-id")
-            console.log(taskid);
-            self.viewTask(taskid)
-
-        })
-    }
-
+   
     initSampleData() {
         if (this.tasks.length === 0) {
             this.tasks = [
@@ -134,7 +84,6 @@ class TaskBlogApp {
             e.preventDefault();
             this.addTask();
         });
-
         document.querySelectorAll('.priority-tag').forEach(tag => {
             tag.addEventListener('click', (e) => {
                 document.querySelectorAll('.priority-tag').forEach(t => t.classList.remove('selected'));
@@ -165,16 +114,7 @@ class TaskBlogApp {
         // Set default datetime
         this.setDefaultDateTime();
     }
-
-    setDefaultDateTime() {
-        const now = new Date();
-        const startTime = new Date(now.getTime() + 30 * 60000); // 30 minutes from now
-        const endTime = new Date(now.getTime() + 90 * 60000); // 1.5 hours from now
-
-        document.getElementById('startTime').value = startTime.toISOString().slice(0, 16);
-        document.getElementById('endTime').value = endTime.toISOString().slice(0, 16);
-    }
-
+    
     renderTasks() {
         const taskPosts = document.getElementById('taskPosts');
         let filteredTasks = this.tasks;
@@ -289,11 +229,9 @@ class TaskBlogApp {
 
         // Create the blog reader content as HTML string
         const blogReaderHTML = `
-            <div class="blog-reader-content">
+            <div id="blogReaderModal" class="blog-reader-content">
                  <button class="blog-reader-close">&times;</button>
-                
                 <div class="blog-reader-header">
-                    
                     <div class="blog-reader-meta">
                         <div class="blog-reader-avatar">${task.author.charAt(0)}</div>
                         <div class="blog-reader-author-info">
@@ -304,12 +242,12 @@ class TaskBlogApp {
                             <button class="action-btn delete-btn">Delete</button>
                         </div>
                         <div class="blog-reader-actions">
-                            <button class="action-btn back-btn">Back</button>
+                            <button class="action-btn close-viewer">Close</button>
                         </div>
                     </div>
                 </div>
                 <div class="blog-reader-content-body">
-                <h1 class="blog-reader-title">${task.title}</h1>
+                    <h1 class="blog-reader-title">${task.title}</h1>
                     <div class="blog-reader-text">${task.description.replace(/\n/g, '<br>')}</div>
                         <div class="blog-reader-details">
                             <div class="blog-reader-detail-item">
@@ -365,13 +303,63 @@ class TaskBlogApp {
         });
     }
 
-    closeBlogReader() {
-        document.getElementById('blogReaderModal').style.display = 'none';
-        this.currentTaskId = null;
-        // Clear the blog reader content
-        $(".container2").html("");
-        $(".page-container").html("")
-        $("#body").html("");
+    OpenAddTask() {
+        $(document).on("click", "#open-modal", function (event) {
+            console.log("clicked")
+            document.getElementById('taskModal').style.display = 'block';
+
+        })
+    }
+
+    closeAddTask() {
+        $(document).on("click", ".close-model", function (event) {
+            console.log("close clicked")
+            document.getElementById('taskModal').style.display = 'none';
+        })
+    }
+
+
+    closeBlogViewer() {
+        let self = this
+        $(document).on("click", ".close-viewer", function (event) {
+            console.log("close clicked")
+            // document.getElementById('blogReaderModal').style.display = 'none';
+            self.closeBlogReader()
+        })
+    }
+
+    deleteBlog() {
+        let self = this
+        $(document).on("click", ".delete-btn", function (event) {
+            console.log("delete clicked")
+
+            let taskid = $(this).data("task-id");
+            // console.log(taskid);
+
+            self.deleteTask()
+
+
+
+            // document.getElementById('taskModal').style.display = 'none';
+        })
+        $(document).on("click", ".confirm-delete-btn", function (event) {
+            console.log("confirm clicked clicked")
+            self.confirmDeleteTask(taskid)
+
+            
+        })
+    }
+
+    viewBlog() {
+        let self = this
+        $(document).on("click", ".view-btn", function (event) {
+            console.log("view-blog clicked");
+            // 
+            let taskid = $(this).data("task-id")
+            console.log(taskid);
+            self.viewTask(taskid)
+
+        })
     }
 
     confirmDeleteTask(taskId) {
@@ -486,11 +474,23 @@ class TaskBlogApp {
         this.renderTasks();
     }
 
+    setDefaultDateTime() {
+        const now = new Date();
+        const startTime = new Date(now.getTime() + 30 * 60000); // 30 minutes from now
+        const endTime = new Date(now.getTime() + 90 * 60000); // 1.5 hours from now
+
+        document.getElementById('startTime').value = startTime.toISOString().slice(0, 16);
+        document.getElementById('endTime').value = endTime.toISOString().slice(0, 16);
+    }
+
+
 
 
     closeBlogReader() {
         document.getElementById('blogReaderModal').style.display = 'none';
         this.currentTaskId = null;
+        this.renderTemplate()
+        
     }
 
     closeDeleteModal() {
