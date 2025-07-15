@@ -19,6 +19,8 @@ class TaskBlogApp {
 
     renderTemplate() {
         console.log("rendererddd");
+        //  this.page-head flex.empty();
+        $(".page-head").html("")
         $(frappe.render_template("task_blogging_v2", {})).appendTo(this.page.main);
         this.tasks = JSON.parse(localStorage.getItem('taskBlogTasks') || '[]');
         this.selectedPriority = 'medium';
@@ -287,27 +289,13 @@ class TaskBlogApp {
         // Clear the container and append the blog reader content
 
         $(".container2").html("");
-        $(".page-container").html("")
-        $("#body").append(blogReaderHTML);
+        // $(".page-container").html("")
+        // $(".page-container").hide();
+        $(".container2").append(blogReaderHTML);
 
-        // Add event listener for the close button
-        $(".blog-reader-close .close-viewer").click(function () {
-            // $(".container2").html("");
-            console.log("close clicked");
-
-            self.closeBlogReader();
-
-            // self.renderTasks()
-            // Optional: reload your task posts here if needed
-            // loadTaskPosts();
-        });
-
-        // Add event listener for the delete button
-        $(".action-btn.delete-btn").click(function () {
-            // Handle delete functionality
-            self.confirmDeleteTask();
-        });
     }
+
+
 
     OpenAddTask() {
         $(document).on("click", "#open-modal", function (event) {
@@ -329,8 +317,21 @@ class TaskBlogApp {
         $(document).on("click", ".close-viewer", function (event) {
             console.log("close clicked")
             // document.getElementById('blogReaderModal').style.display = 'none';
+            $(".container2").html("");
             self.closeBlogReader()
         })
+
+        // // Add event listener for the close button
+        // $(".blog-reader-close .close-viewer").click(function () {
+        //     // $(".container2").html("");
+        //     console.log("close clicked");
+
+        //     self.closeBlogReader();
+
+        //     // self.renderTasks()
+        //     // Optional: reload your task posts here if needed
+        //     // loadTaskPosts();
+        // });
     }
 
     closeBlogReader() {
