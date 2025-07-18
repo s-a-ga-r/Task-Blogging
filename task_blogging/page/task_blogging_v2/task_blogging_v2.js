@@ -236,7 +236,6 @@ class TaskBlogApp {
         // Create the blog reader content as HTML string
         const blogReaderHTML = `
             <div id="blogReaderModal" class="blog-reader-content">
-                 <button class="blog-reader-close">&times;</button>
                 <div class="blog-reader-header">
                     <div class="blog-reader-meta">
                         <div class="blog-reader-avatar">${task.author.charAt(0)}</div>
@@ -289,10 +288,11 @@ class TaskBlogApp {
         // Clear the container and append the blog reader content
 
         $(".container2").html("");
+        $(".container2").css("display", "block");
+
         // $(".page-container").html("")
         // $(".page-container").hide();
         $(".container2").append(blogReaderHTML);
-
     }
 
 
@@ -316,22 +316,9 @@ class TaskBlogApp {
         let self = this
         $(document).on("click", ".close-viewer", function (event) {
             console.log("close clicked")
-            // document.getElementById('blogReaderModal').style.display = 'none';
-            $(".container2").html("");
+            $(".container2").remove();
             self.closeBlogReader()
         })
-
-        // // Add event listener for the close button
-        // $(".blog-reader-close .close-viewer").click(function () {
-        //     // $(".container2").html("");
-        //     console.log("close clicked");
-
-        //     self.closeBlogReader();
-
-        //     // self.renderTasks()
-        //     // Optional: reload your task posts here if needed
-        //     // loadTaskPosts();
-        // });
     }
 
     closeBlogReader() {
