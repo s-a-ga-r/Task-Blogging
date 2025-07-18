@@ -23,17 +23,20 @@ class TaskBlogApp {
         $(".page-head").html("")
         $(frappe.render_template("task_blogging_v2", {})).appendTo(this.page.main);
         this.tasks = JSON.parse(localStorage.getItem('taskBlogTasks') || '[]');
+        this.posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
         this.selectedPriority = 'medium';
         this.currentFilter = 'all';
         this.currentTaskId = null;
         this.initSampleData();
         this.renderTasks();
+        
         this.updateStats();
         this.bindEvents();
         this.OpenAddTask()
         this.closeAddTask()
         this.deleteBlog()
         this.closeViewer()
+        this.openTaskPostModel()
     }
    
     initSampleData() {
@@ -77,7 +80,123 @@ class TaskBlogApp {
                 }
             ];
             this.saveTasks();
+            
         }
+
+        if (this.posts.length === 0) {
+            this.posts = [
+                {
+                    id: 1,
+                    author: 'CoreyMS',
+                    title: 'My Latest Post!',
+                    content: 'My latest post! This is exciting...\n\nThis will be a good overview of how to use the Django framework. I hope you all learn a lot and enjoy the series!',
+                    date: 'August 27, 2018',
+                    avatar: 'C'
+                },
+                {
+                    id: 2,
+                    author: 'TestUser',
+                    title: 'Top 5 YouTube Channels For Learning Programming',
+                    content: 'Quo inanis quando ea, mel an vide adversarium suscipiantur. Et dicunt eleifend splendide pro. Nibh animal dolorem vim ex, nec te agam referrentur. Usu admodum ocurreret ne.\n\nEt dico audire cotidieque sed, cibo latine ut has, an case magna alienum.',
+                    date: 'August 26, 2018',
+                    avatar: 'T'
+                },
+                {
+                    id: 3,
+                    author: 'TestUser',
+                    title: 'The Rise of Data Science',
+                    content: 'Per omittam placerat at. Eius aeque ei mei. Usu ex partiendo salutandi. Pro illud placerat molestiae ex, habeo vidisse volutpatum cu vel, efficiendi accommodare eum ea! Ne has case minimum facilisis, pertinax efficiendi eu vel!\n\nEt movet semper assueverit his. Mei et liber vitae. Vix et pericula definebas, vero falli.',
+                    date: 'August 26, 2018',
+                    avatar: 'T'
+                },
+                {
+                    id: 4,
+                    author: 'TestUser',
+                    title: '5 Tips for Writing Catchy Headlines',
+                    content: 'Learn how to write headlines that grab attention and keep readers engaged. These simple techniques will help you create compelling titles for your blog posts.',
+                    date: 'August 26, 2018',
+                    avatar: 'T'
+                }
+            ];
+            this.savePosts();
+        }
+    }
+
+
+    openTaskPostModel(){
+        let self = this
+        // Opening the task post where those tasks are belongs to this project.
+        $(document).on("click",".task-post",function(event){
+            // Prevent the click event from propagating to the parent task-post div
+            event.stopPropagation();
+            console.log("task is clicked");
+            $(".container2").html("");
+
+            $(".container2").css({
+               "max-width": "1200px",
+                "margin": "0 auto",
+                "padding": "20px",
+                "display": "grid",
+                "grid-template-columns": "1fr 300px",
+                "gap": "30px"
+            });
+
+            let container_content = `
+                <div class="main-content">
+                    <div id="blogPosts">
+                        <!-- Sample posts will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <h3>Our Sidebar</h3>
+                    <p class="sidebar-description">You can put any information here you'd like.</p>
+                    <ul class="sidebar-menu">
+                        <li>Latest Posts</li>
+                        <li>Announcements</li>
+                        <li>Calendars</li>
+                        <li>etc</li>
+                    </ul>
+                </div>
+
+
+                <div id="postModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">Create New Post</h2>
+                            <button class="close-btn" onclick="closeModal()">&times;</button>
+                        </div>
+                        <form id="postForm">
+                            <div class="form-group">
+                                <label for="authorName">Author Name</label>
+                                <input type="text" id="authorName" name="authorName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="postTitle">Post Title</label>
+                                <input type="text" id="postTitle" name="postTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="postContent">Post Content</label>
+                                <textarea id="postContent" name="postContent" required></textarea>
+                            </div>
+                            <div style="text-align: right;">
+                                <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                                <button type="submit" class="submit-btn">Publish Post</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            `
+            $(".container2").append(container_content)
+
+            self.renderPosts();
+
+            taskModelcss() // geting style for task model
+
+            
+
+        })
     }
 
 
@@ -152,11 +271,11 @@ class TaskBlogApp {
 
         taskPosts.innerHTML = filteredTasks.map(task => `
             <div class="task-post">
-                <div class="post-header">
-                    <div class="author-avatar">${task.author.charAt(0)}</div>
-                    <div class="post-meta">
-                        <div class="author-name">${task.author}</div>
-                        <div class="post-date">${this.formatDate(task.createdAt)}</div>
+                <div class="task-post-header">
+                    <div class="task-author-avatar">${task.author.charAt(0)}</div>
+                    <div class="task-post-meta">
+                        <div class="task-author-name">${task.author}</div>
+                        <div class="task-post-date">${this.formatDate(task.createdAt)}</div>
                     </div>
                     <div class="task-status ${task.status.replace('-', '')}">${task.status.replace('-', ' ').toUpperCase()}</div>
                 </div>
@@ -176,6 +295,37 @@ class TaskBlogApp {
 
 
         this.viewBlog()
+    }
+
+    renderPosts() {
+        const blogPosts = document.getElementById('blogPosts');
+
+        
+        if (this.posts.length === 0) {
+            blogPosts.innerHTML = `
+                <div class="empty-state">
+                    <h3>No posts yet</h3>
+                    <p>Start by creating your first blog post!</p>
+                </div>
+            `;
+            return;
+        }
+
+        console.log(this.posts);
+
+        blogPosts.innerHTML = this.posts.map(post => `
+            <div class="blog-post">
+                <div class="post-header">
+                    <div class="author-avatar">${post.avatar}</div>
+                    <div class="post-meta">
+                        <div class="author-name">${post.author}</div>
+                        <div class="post-date">${post.date}</div>
+                    </div>
+                </div>
+                <h2 class="post-title">${post.title}</h2>
+                <div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>
+            </div>
+        `).join('');
     }
 
     // viewTask(taskId) {
@@ -332,7 +482,7 @@ class TaskBlogApp {
     deleteBlog() {
         let self = this
         $(document).on("click", ".delete-btn", function (event) {
-            console.log("delete clicked")
+            console.log("delete     ")
 
             let taskid = $(this).data("task-id");
             // console.log(taskid);
@@ -408,6 +558,9 @@ class TaskBlogApp {
 
     saveTasks() {
         localStorage.setItem('taskBlogTasks', JSON.stringify(this.tasks));
+    }
+    savePosts() {
+        localStorage.setItem('blogPosts', JSON.stringify(this.posts));
     }
 
     updateStats() {
@@ -542,3 +695,276 @@ class TaskBlogApp {
 //         closeDeleteModal();
 //     }
 // });
+
+function taskModelcss(){
+    console.log("yess i get called");
+
+    let container_css = `
+       .main-content {
+            background: transparent;
+        }
+
+        .blog-post:last-child {
+            margin-bottom: 0;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            background-color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: #4a90e2;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .post-date {
+            color: #868e96;
+            font-size: 13px;
+        }
+
+        .post-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .post-content {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+
+        .sidebar {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-description {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+            color: #6c757d;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar-menu li:hover {
+            color: #4a90e2;
+        }
+
+        .sidebar-menu li:last-child {
+            border-bottom: none;
+        }
+
+
+        .add-post-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .add-post-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #357abd;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 10px;
+            }
+            
+            .blog-post {
+                padding: 20px;
+            }
+            
+            .sidebar {
+                order: -1;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #6c757d;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+
+        
+    `;
+
+    $("style").first().append(container_css);
+
+}
