@@ -70,14 +70,14 @@ body {
     flex: 1;
 }
 
-.author-name {
+.task-author-name {
     font-weight: 600;
     color: #4a90e2;
     font-size: 14px;
     margin-bottom: 2px;
 }
 
-.blog-post-date {
+.task-post-date {
     color: #868e96;
     font-size: 13px;
 }

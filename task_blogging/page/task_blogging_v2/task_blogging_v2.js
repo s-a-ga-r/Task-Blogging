@@ -22,26 +22,25 @@ class TaskBlogApp {
         //  this.page-head flex.empty();
         $(".page-head").html("")
         $(frappe.render_template("task_blogging_v2", {})).appendTo(this.page.main);
-        this.tasks = JSON.parse(localStorage.getItem('taskBlogTasks') || '[]');
+        this.projects = JSON.parse(localStorage.getItem('ProjectPosts') || '[]');
         this.posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
         this.selectedPriority = 'medium';
         this.currentFilter = 'all';
-        this.currentTaskId = null;
+        this.currentProjectId = null;
         this.initSampleData();
-        this.renderTasks();
-        
+        this.renderProjects();
         this.updateStats();
         this.bindEvents();
-        this.OpenAddTask()
-        this.closeAddTask()
+        this.addProject()
+        this.closeAddProject()
         this.deleteBlog()
         this.closeViewer()
-        this.openTaskPostModel()
+        this.openTasks()
     }
    
     initSampleData() {
-        if (this.tasks.length === 0) {
-            this.tasks = [
+        if (this.projects.length === 0) {
+            this.projects = [
                 {
                     id: 1,
                     title: 'Complete Django Tutorial Series',
@@ -79,10 +78,9 @@ class TaskBlogApp {
                     author: 'TaskUser'
                 }
             ];
-            this.saveTasks();
+            this.saveProjects();
             
         }
-
         if (this.posts.length === 0) {
             this.posts = [
                 {
@@ -122,8 +120,7 @@ class TaskBlogApp {
         }
     }
 
-
-    openTaskPostModel(){
+    openTasks(){
         let self = this
         // Opening the task post where those tasks are belongs to this project.
         $(document).on("click",".task-post",function(event){
@@ -132,17 +129,8 @@ class TaskBlogApp {
             console.log("task is clicked");
             $(".container2").html("");
 
-            $(".container2").css({
-               "max-width": "1200px",
-                "margin": "0 auto",
-                "padding": "20px",
-                "display": "grid",
-                "grid-template-columns": "1fr 300px",
-                "gap": "30px"
-            });
-
             let container_content = `
-                <div class="main-content">
+                <div class="post-main-content">
                     <div id="blogPosts">
                         <!-- Sample posts will be loaded here -->
                     </div>
@@ -155,7 +143,7 @@ class TaskBlogApp {
                         <li>Latest Posts</li>
                         <li>Announcements</li>
                         <li>Calendars</li>
-                        <li>etc</li>
+                       <li class="go-back"><i class="fa fa-arrow-left"></i> Back</li>
                     </ul>
                 </div>
 
@@ -190,18 +178,14 @@ class TaskBlogApp {
             `
             $(".container2").append(container_content)
 
-            self.renderPosts();
-
-            taskModelcss() // geting style for task model
-
-            
+            self.renderTasks();
+             // geting style for task model
 
         })
     }
 
-
     bindEvents() {
-        document.getElementById('taskForm').addEventListener('submit', (e) => {
+        document.getElementById('projectForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.addTask();
         });
@@ -214,7 +198,7 @@ class TaskBlogApp {
         });
 
         // Close modals when clicking outside
-        document.getElementById('taskModal').addEventListener('click', (e) => {
+        document.getElementById('projectModal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) {
                 this.closeModal();
             }
@@ -236,31 +220,31 @@ class TaskBlogApp {
         this.setDefaultDateTime();
     }
     
-    renderTasks() {
-        console.log("rendering tasks");
-        const taskPosts = document.getElementById('taskPosts');
-        let filteredTasks = this.tasks;
+    renderProjects() {
+        console.log("rendering Projects");
+        const projectPosts = document.getElementById('projectPosts');
+        let filteredProjects = this.projects;
 
         switch (this.currentFilter) {
             case 'today':
                 const today = new Date().toDateString();
-                filteredTasks = this.tasks.filter(task =>
+                filteredProjects = this.projects.filter(task =>
                     new Date(task.startTime).toDateString() === today
                 );
                 break;
             case 'high':
-                filteredTasks = this.tasks.filter(task => task.priority === 'high');
+                filteredProjects = this.projects.filter(task => task.priority === 'high');
                 break;
             case 'completed':
-                filteredTasks = this.tasks.filter(task => task.status === 'completed');
+                filteredProjects = this.projects.filter(task => task.status === 'completed');
                 break;
             case 'pending':
-                filteredTasks = this.tasks.filter(task => task.status === 'pending');
+                filteredProjects = this.projects.filter(task => task.status === 'pending');
                 break;
         }
 
-        if (filteredTasks.length === 0) {
-            taskPosts.innerHTML = `
+        if (filteredProjects.length === 0) {
+            projectPosts.innerHTML = `
                 <div class="empty-state">
                     <h3>No tasks found</h3>
                     <p>Start by creating your first task!</p>
@@ -269,7 +253,7 @@ class TaskBlogApp {
             return;
         }
 
-        taskPosts.innerHTML = filteredTasks.map(task => `
+        projectPosts.innerHTML = filteredProjects.map(task => `
             <div class="task-post">
                 <div class="task-post-header">
                     <div class="task-author-avatar">${task.author.charAt(0)}</div>
@@ -294,10 +278,10 @@ class TaskBlogApp {
         `).join('');
 
 
-        this.viewBlog()
+        this.viewProjectBlog()
     }
 
-    renderPosts() {
+    renderTasks() {
         const blogPosts = document.getElementById('blogPosts');
 
         
@@ -326,10 +310,85 @@ class TaskBlogApp {
                 <div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>
             </div>
         `).join('');
+
+        taskModelcss()
+        this.goBack()
+    }
+
+    viewProject(projectId) {
+        let self = this
+        const project = this.projects.find(p => p.id === projectId);
+        if (!project) {
+            console.error(`Task with ID ${projectId} not found`);
+            return;
+        };
+
+        this.currentProjectId = projectId;
+
+        // Create the blog reader content as HTML string
+        const blogReaderHTML = `
+            <div id="blogReaderModal" class="blog-reader-content">
+                <div class="blog-reader-header">
+                    <div class="blog-reader-meta">
+                        <div class="blog-reader-avatar">${project.author.charAt(0)}</div>
+                        <div class="blog-reader-author-info">
+                            <div class="blog-reader-author-name">${project.author}</div>
+                            <div class="blog-reader-date">${this.formatDate(project.createdAt)}</div>
+                        </div>
+                        <div class="blog-reader-actions">
+                            <button class="action-btn delete-btn">Delete</button>
+                        </div>
+                        <div class="blog-reader-actions">
+                            <button class="action-btn close-viewer">Close</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-reader-content-body">
+                    <h1 class="blog-reader-title">${project.title}</h1>
+                    <div class="blog-reader-text">${project.description.replace(/\n/g, '<br>')}</div>
+                        <div class="blog-reader-details">
+                            <div class="blog-reader-detail-item">
+                                <div class="blog-reader-detail-label">Category</div>
+                                <div class="blog-reader-detail-value">${project.category.charAt(0).toUpperCase() + project.category.slice(1)}</div>
+                            </div>
+                            <div class="blog-reader-detail-item">
+                                <div class="blog-reader-detail-label">Priority</div>
+                                <div class="blog-reader-detail-value">${project.priority.charAt(0).toUpperCase() + project.priority.slice(1)}</div>
+                            </div>
+                            <div class="blog-reader-detail-item">
+                                <div class="blog-reader-detail-label">Status</div>
+                                <div class="blog-reader-detail-value">${project.status.replace('-', ' ').toUpperCase()}</div>
+                            </div>
+                            <div class="blog-reader-detail-item">
+                                <div class="blog-reader-detail-label">Start Time</div>
+                                <div class="blog-reader-detail-value">${this.formatFullDateTime(project.startTime)}</div>
+                            </div>
+                            <div class="blog-reader-detail-item">
+                                <div class="blog-reader-detail-label">End Time</div>
+                                <div class="blog-reader-detail-value">${this.formatFullDateTime(project.endTime)}</div>
+                            </div>
+                            <div class="blog-reader-detail-item">
+                                <div class="blog-reader-detail-label">Duration</div>
+                                <div class="blog-reader-detail-value">${this.calculateDuration(project.startTime, project.endTime)}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Clear the container and append the blog reader content
+
+        $(".container2").html("");
+        $(".container2").css("display", "block");
+
+        // $(".page-container").html("")
+        // $(".page-container").hide();
+        $(".container2").append(blogReaderHTML);
     }
 
     // viewTask(taskId) {
-    //     const task = this.tasks.find(t => t.id === taskId);
+    //     const task = task.projects.find(t => t.id === taskId);
     //     if (!task) return;
     //     this.currentTaskId = taskId;
     //     // Populate blog reader modal
@@ -373,91 +432,29 @@ class TaskBlogApp {
     //     document.getElementById('blogReaderModal').style.display = 'block';
     // }
 
-    viewTask(taskId) {
+    goBack(){
         let self = this
-        const task = this.tasks.find(t => t.id === taskId);
-        if (!task) {
-            console.error(`Task with ID ${taskId} not found`);
-            return;
-        };
+        $(document).on("click",".go-back",function(event){
+            console.log("back clicked");
+            $(".container2").remove();
+            self.renderTemplate()
 
-        this.currentTaskId = taskId;
-
-        // Create the blog reader content as HTML string
-        const blogReaderHTML = `
-            <div id="blogReaderModal" class="blog-reader-content">
-                <div class="blog-reader-header">
-                    <div class="blog-reader-meta">
-                        <div class="blog-reader-avatar">${task.author.charAt(0)}</div>
-                        <div class="blog-reader-author-info">
-                            <div class="blog-reader-author-name">${task.author}</div>
-                            <div class="blog-reader-date">${this.formatDate(task.createdAt)}</div>
-                        </div>
-                        <div class="blog-reader-actions">
-                            <button class="action-btn delete-btn">Delete</button>
-                        </div>
-                        <div class="blog-reader-actions">
-                            <button class="action-btn close-viewer">Close</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="blog-reader-content-body">
-                    <h1 class="blog-reader-title">${task.title}</h1>
-                    <div class="blog-reader-text">${task.description.replace(/\n/g, '<br>')}</div>
-                        <div class="blog-reader-details">
-                            <div class="blog-reader-detail-item">
-                                <div class="blog-reader-detail-label">Category</div>
-                                <div class="blog-reader-detail-value">${task.category.charAt(0).toUpperCase() + task.category.slice(1)}</div>
-                            </div>
-                            <div class="blog-reader-detail-item">
-                                <div class="blog-reader-detail-label">Priority</div>
-                                <div class="blog-reader-detail-value">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</div>
-                            </div>
-                            <div class="blog-reader-detail-item">
-                                <div class="blog-reader-detail-label">Status</div>
-                                <div class="blog-reader-detail-value">${task.status.replace('-', ' ').toUpperCase()}</div>
-                            </div>
-                            <div class="blog-reader-detail-item">
-                                <div class="blog-reader-detail-label">Start Time</div>
-                                <div class="blog-reader-detail-value">${this.formatFullDateTime(task.startTime)}</div>
-                            </div>
-                            <div class="blog-reader-detail-item">
-                                <div class="blog-reader-detail-label">End Time</div>
-                                <div class="blog-reader-detail-value">${this.formatFullDateTime(task.endTime)}</div>
-                            </div>
-                            <div class="blog-reader-detail-item">
-                                <div class="blog-reader-detail-label">Duration</div>
-                                <div class="blog-reader-detail-value">${this.calculateDuration(task.startTime, task.endTime)}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Clear the container and append the blog reader content
-
-        $(".container2").html("");
-        $(".container2").css("display", "block");
-
-        // $(".page-container").html("")
-        // $(".page-container").hide();
-        $(".container2").append(blogReaderHTML);
-    }
-
-
-
-    OpenAddTask() {
-        $(document).on("click", "#open-modal", function (event) {
-            console.log("clicked")
-            document.getElementById('taskModal').style.display = 'block';
         })
     }
 
-    closeAddTask() {
+
+
+    addProject() {
+        $(document).on("click", "#open-modal", function (event) {
+            console.log("clicked")
+            document.getElementById('projectModal').style.display = 'block';
+        })
+    }
+
+    closeAddProject() {
         $(document).on("click", ".close-model", function (event) {
             console.log("close clicked")
-            document.getElementById('taskModal').style.display = 'none';
+            document.getElementById('projectModal').style.display = 'none';
         })
     }
 
@@ -487,7 +484,7 @@ class TaskBlogApp {
             let taskid = $(this).data("task-id");
             // console.log(taskid);
             self.deleteTask()
-            // document.getElementById('taskModal').style.display = 'none';
+            // document.getElementById('projectModal').style.display = 'none';
         })
         $(document).on("click", ".confirm-delete-btn", function (event) {
             console.log("confirm clicked clicked")
@@ -497,14 +494,15 @@ class TaskBlogApp {
         })
     }
 
-    viewBlog() {
+    viewProjectBlog() {
         let self = this
         $(document).on("click", ".view-btn", function (event) {
+             event.stopPropagation();
             console.log("view-blog clicked");
             // 
             let taskid = $(this).data("task-id")
             console.log(taskid);
-            self.viewTask(taskid)
+            self.viewProject(taskid)
 
         })
     }
@@ -516,8 +514,8 @@ class TaskBlogApp {
 
     deleteTask() {
         if (!this.currentTaskId) return;
-        this.tasks = this.tasks.filter(task => task.id !== this.currentTaskId);
-        this.saveTasks();
+        task.projects = task.projects.filter(task => task.id !== this.currentTaskId);
+        this.saveProjects();
         this.renderTasks();
         this.updateStats();
         this.closeDeleteModal();
@@ -526,7 +524,7 @@ class TaskBlogApp {
     }
 
     addTask() {
-        const form = document.getElementById('taskForm');
+        const form = document.getElementById('projectForm');
         const formData = new FormData(form);
 
         const newTask = {
@@ -542,8 +540,8 @@ class TaskBlogApp {
             author: 'TaskUser'
         };
 
-        this.tasks.unshift(newTask);
-        this.saveTasks();
+        task.projects.unshift(newTask);
+        this.saveProjects();
         this.renderTasks();
         this.updateStats();
         this.closeModal();
@@ -556,8 +554,8 @@ class TaskBlogApp {
         this.selectedPriority = 'medium';
     }
 
-    saveTasks() {
-        localStorage.setItem('taskBlogTasks', JSON.stringify(this.tasks));
+    saveProjects() {
+        localStorage.setItem('ProjectPosts', JSON.stringify(this.projects));
     }
     savePosts() {
         localStorage.setItem('blogPosts', JSON.stringify(this.posts));
@@ -565,13 +563,13 @@ class TaskBlogApp {
 
     updateStats() {
         const today = new Date().toDateString();
-        const todayTasks = this.tasks.filter(task =>
+        const todayTasks = this.projects.filter(task =>
             new Date(task.startTime).toDateString() === today
         );
-        const completedTasks = this.tasks.filter(task => task.status === 'completed');
-        const pendingTasks = this.tasks.filter(task => task.status === 'pending');
+        const completedTasks = this.projects.filter(task => task.status === 'completed');
+        const pendingTasks = this.projects.filter(task => task.status === 'pending');
 
-        document.getElementById('totalTasks').textContent = this.tasks.length;
+        document.getElementById('totalTasks').textContent = this.projects.length;
         document.getElementById('todayTasks').textContent = todayTasks.length;
         document.getElementById('completedTasks').textContent = completedTasks.length;
         document.getElementById('pendingTasks').textContent = pendingTasks.length;
@@ -700,9 +698,44 @@ function taskModelcss(){
     console.log("yess i get called");
 
     let container_css = `
-       .main-content {
+
+        .container2 {
+            "max-width": "1200px",
+            "margin": "0 auto",
+            "padding": "20px",
+            "display": "grid",
+            "grid-template-columns": "1fr 300px",
+            "gap": "30px"
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+
+       .post-main-content {
             background: transparent;
         }
+
+        .blog-post {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
 
         .blog-post:last-child {
             margin-bottom: 0;
