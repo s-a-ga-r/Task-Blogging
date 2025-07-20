@@ -18,7 +18,7 @@ class TaskBlogApp {
     }
 
     renderTemplate() {
-        console.log("rendererddd");
+        console.log("renderTemplate Called");
         //  this.page-head flex.empty();
         $(".page-head").html("")
         $(frappe.render_template("task_blogging_v2", {})).appendTo(this.page.main);
@@ -35,7 +35,7 @@ class TaskBlogApp {
         this.closeAddProject()
         this.deleteBlog()
         this.closeViewer()
-        this.openTasks()
+        this.openProject()
     }
    
     initSampleData() {
@@ -120,13 +120,13 @@ class TaskBlogApp {
         }
     }
 
-    openTasks(){
+    openProject(){
         let self = this
         // Opening the task post where those tasks are belongs to this project.
         $(document).on("click",".task-post",function(event){
             // Prevent the click event from propagating to the parent task-post div
             event.stopPropagation();
-            console.log("task is clicked");
+            console.log("Task List opened of this project");
             $(".container2").html("");
 
             let container_content = `
@@ -295,7 +295,9 @@ class TaskBlogApp {
             return;
         }
 
-        console.log(this.posts);
+        console.log(this.posts); 
+
+        console.log("Task rendered");
 
         blogPosts.innerHTML = this.posts.map(post => `
             <div class="blog-post">
@@ -695,7 +697,8 @@ class TaskBlogApp {
 // });
 
 function taskModelcss(){
-    console.log("yess i get called");
+    // console.log("Task css");
+
 
     let container_css = `
 
